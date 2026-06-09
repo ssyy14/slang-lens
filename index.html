@@ -490,6 +490,85 @@ body {
   padding: 8px 0;
 }
 
+/* ===== Original Text Bar ===== */
+.original-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.original-text {
+  flex: 1;
+  font-family: var(--font-en);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.btn-speak {
+  width: 38px; height: 38px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.btn-speak:hover {
+  background: #f0e6d2;
+  border-color: var(--meaning);
+  color: var(--meaning);
+}
+
+.btn-speak.playing {
+  background: var(--meaning);
+  border-color: var(--meaning);
+  color: white;
+  animation: pulse-speak 1s infinite;
+}
+
+@keyframes pulse-speak {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 69, 54, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(196, 69, 54, 0); }
+}
+
+/* Example speak button */
+.example-speak {
+  display: inline-flex;
+  align-items: center; gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.example-speak:hover {
+  color: var(--example);
+  background: rgba(45, 106, 143, 0.08);
+}
+
+.example-speak.playing {
+  color: var(--example);
+}
+
 /* ===== Footer ===== */
 .footer {
   text-align: center;
@@ -757,6 +836,51 @@ function simpleMarkdown(text) {
     .replace(/\n- /g, '\n• ');
 }
 
+// ===== Speech =====
+function speak(text, btn) {
+  // Stop any ongoing speech
+  window.speechSynthesis.cancel();
+
+  // If the clicked button was already playing, just stop
+  if (btn && btn.classList.contains('playing')) {
+    btn.classList.remove('playing');
+    return;
+  }
+
+  // Remove playing state from all speak buttons
+  document.querySelectorAll('.btn-speak.playing, .example-speak.playing').forEach(function(el) {
+    el.classList.remove('playing');
+  });
+
+  var utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = 0.9;
+
+  // Try to pick a good English voice
+  var voices = window.speechSynthesis.getVoices();
+  var enVoice = voices.find(function(v) { return v.lang === 'en-US' && v.name.indexOf('Google') !== -1; }) ||
+                voices.find(function(v) { return v.lang === 'en-US'; }) ||
+                voices.find(function(v) { return v.lang.startsWith('en'); });
+  if (enVoice) utterance.voice = enVoice;
+
+  if (btn) btn.classList.add('playing');
+
+  utterance.onend = function() {
+    if (btn) btn.classList.remove('playing');
+  };
+
+  utterance.onerror = function() {
+    if (btn) btn.classList.remove('playing');
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// Preload voices (some browsers load them async)
+window.speechSynthesis.onvoiceschanged = function() {
+  window.speechSynthesis.getVoices();
+};
+
 // ===== Error Handling =====
 function showError(msg) {
   $errorMsg.textContent = msg;
@@ -863,6 +987,13 @@ function buildResultHTML(data) {
 
   var html = '';
 
+  // Original text bar with speak button
+  var originalText = data.original || '';
+  html += '<div class="original-bar">' +
+    '<div class="original-text">' + escapeHtml(originalText) + '</div>' +
+    '<button class="btn-speak" data-speak="' + escapeHtml(originalText) + '" title="朗读发音">🔊</button>' +
+    '</div>';
+
   // Literal
   if (data.literal) {
     html += '<div class="result-card literal">' +
@@ -900,7 +1031,7 @@ function buildResultHTML(data) {
     html += '<div class="result-card example">' +
       '<div class="card-label">✏️ 例句</div>' +
       '<div class="card-content">' +
-      (data.example_en ? '<div class="example-en">"' + escapeHtml(data.example_en) + '"</div>' : '') +
+      (data.example_en ? '<div class="example-en">"' + escapeHtml(data.example_en) + '"<button class="example-speak" data-speak="' + escapeHtml(data.example_en) + '" title="朗读例句">🔊</button></div>' : '') +
       (data.example_cn ? '<div class="example-cn">' + escapeHtml(data.example_cn) + '</div>' : '') +
       '</div></div>';
   }
@@ -993,6 +1124,14 @@ $quickExamples.forEach(function(el) {
 // ===== Init =====
 function init() {
   renderHistory();
+
+  // Delegate speak button clicks
+  $results.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-speak') || e.target.closest('.example-speak');
+    if (!btn) return;
+    e.preventDefault();
+    speak(btn.dataset.speak, btn);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);
