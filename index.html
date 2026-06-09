@@ -513,6 +513,15 @@ body {
   letter-spacing: -0.3px;
 }
 
+.original-phonetic {
+  font-family: var(--font-en);
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: normal;
+  letter-spacing: 0.5px;
+}
+
 .btn-speak {
   width: 38px; height: 38px;
   border: 1px solid var(--border);
@@ -927,7 +936,8 @@ function buildSystemPrompt() {
     '  "usage": "用法说明（中文，什么场景用、什么语气、注意什么）",\n' +
     '  "example_en": "一句自然的英文例句",\n' +
     '  "example_cn": "例句的中文翻译",\n' +
-    '  "tags": ["标签1", "标签2"]\n' +
+    '  "tags": ["标签1", "标签2"],\n' +
+    '  "phonetic": "IPA音标，例如 /spɪl ðə tiː/。注意：缩写（如TL;DR）直接按字母读，音标写成 /tiː el diː ɑːr/ 形式"\n' +
     '}';
 }
 
@@ -990,7 +1000,10 @@ function buildResultHTML(data) {
   // Original text bar with speak button
   var originalText = data.original || '';
   html += '<div class="original-bar">' +
+    '<div style="flex:1">' +
     '<div class="original-text">' + escapeHtml(originalText) + '</div>' +
+    (data.phonetic ? '<div class="original-phonetic">' + escapeHtml(data.phonetic) + '</div>' : '') +
+    '</div>' +
     '<button class="btn-speak" data-speak="' + escapeHtml(originalText) + '" title="朗读发音">🔊</button>' +
     '</div>';
 
