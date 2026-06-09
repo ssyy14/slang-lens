@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slang Lens — 英语俚语翻译</title>
+<style>
+/* ===== Reset & Variables ===== */
+:root {
+  --bg: #faf7f2;
+  --card-bg: #fff8e7;
+  --card-bg-alt: #fdf3e0;
+  --text: #2c1810;
+  --text-secondary: #6b5e53;
+  --text-muted: #9a8c80;
+  --border: #e8dcc8;
+  --shadow: 0 2px 12px rgba(60, 30, 10, 0.06);
+  --shadow-hover: 0 4px 20px rgba(60, 30, 10, 0.10);
+  --literal: #d4922a;
+  --meaning: #c44536;
+  --culture: #2d5a3d;
+  --usage: #6b4c9a;
+  --example: #2d6a8f;
+  --btn-bg: #c44536;
+  --btn-hover: #a8382b;
+  --btn-text: #fff;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-cn: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-en: Georgia, "Times New Roman", serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-cn);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Container ===== */
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+}
+
+.header-left { display: flex; align-items: baseline; gap: 10px; }
+
+.header h1 {
+  font-family: var(--font-en);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.header h1 span { color: var(--meaning); }
+
+.header .subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.btn-settings {
+  width: 40px; height: 40px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.btn-settings:hover {
+  background: #f0e6d2;
+  border-color: #d4c4a8;
+}
+
+/* ===== Settings Modal ===== */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(30, 15, 5, 0.4);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  align-items: center; justify-content: center;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 8px 40px rgba(60, 30, 10, 0.15);
+  border: 1px solid var(--border);
+}
+
+.modal h3 {
+  font-family: var(--font-en);
+  font-size: 20px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.modal .hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.modal input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+
+.modal input:focus {
+  outline: none;
+  border-color: var(--meaning);
+}
+
+.modal .api-source {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.modal .api-source a {
+  color: var(--meaning);
+  text-decoration: none;
+}
+
+.modal-actions {
+  display: flex; gap: 10px;
+  margin-top: 18px;
+  justify-content: flex-end;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+}
+
+.btn-primary:hover { background: var(--btn-hover); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover { background: #f0e6d2; }
+
+/* ===== Input Area ===== */
+.input-area { margin-bottom: 24px; }
+
+.input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.input-wrapper textarea {
+  flex: 1;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-family: var(--font-en);
+  background: var(--card-bg);
+  color: var(--text);
+  resize: none;
+  min-height: 52px;
+  max-height: 120px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  line-height: 1.5;
+}
+
+.input-wrapper textarea:focus {
+  outline: none;
+  border-color: var(--meaning);
+  box-shadow: 0 0 0 3px rgba(196, 69, 54, 0.1);
+}
+
+.input-wrapper textarea::placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-cn);
+  font-size: 14px;
+}
+
+.input-wrapper .btn-translate {
+  padding: 0 24px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.input-wrapper .btn-translate:hover { background: var(--btn-hover); }
+.input-wrapper .btn-translate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Quick examples */
+.quick-examples {
+  display: flex; gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-example {
+  padding: 6px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: var(--font-en);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.quick-example:hover {
+  background: #f0e6d2;
+  border-color: var(--meaning);
+  color: var(--meaning);
+}
+
+/* ===== Error Message ===== */
+.error-msg {
+  display: none;
+  padding: 12px 16px;
+  background: #fef0ed;
+  border: 1px solid #f5c6be;
+  border-radius: var(--radius-sm);
+  color: var(--meaning);
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.error-msg.active { display: block; }
+
+/* ===== Results Area ===== */
+.results { display: none; }
+
+.results.active { display: block; }
+
+.result-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  border-left: 4px solid transparent;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s;
+}
+
+.result-card:hover { box-shadow: var(--shadow-hover); }
+
+.result-card .card-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex; align-items: center;
+  gap: 6px;
+}
+
+.result-card .card-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.result-card .card-content p { margin-bottom: 8px; }
+.result-card .card-content p:last-child { margin-bottom: 0; }
+
+.result-card .card-content strong { color: var(--text); }
+.result-card .card-content em { color: var(--text-secondary); }
+
+.result-card.literal { border-left-color: var(--literal); }
+.result-card.literal .card-label { color: var(--literal); }
+.result-card.meaning { border-left-color: var(--meaning); }
+.result-card.meaning .card-label { color: var(--meaning); }
+.result-card.culture { border-left-color: var(--culture); }
+.result-card.culture .card-label { color: var(--culture); }
+.result-card.usage { border-left-color: var(--usage); }
+.result-card.usage .card-label { color: var(--usage); }
+.result-card.example { border-left-color: var(--example); }
+.result-card.example .card-label { color: var(--example); }
+
+.result-card .example-en {
+  font-family: var(--font-en);
+  font-style: italic;
+  color: var(--example);
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.result-card .example-cn {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Tags */
+.tags {
+  display: flex; gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.tag {
+  padding: 3px 10px;
+  background: #f0e6d2;
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ===== Loading Skeleton ===== */
+.skeleton {
+  display: none;
+  flex-direction: column; gap: 12px;
+}
+
+.skeleton.active { display: flex; }
+
+.skeleton-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  border-left: 4px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.skeleton-line {
+  height: 14px;
+  background: linear-gradient(90deg, #e8dcc8 25%, #f0e6d2 50%, #e8dcc8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line:last-child { margin-bottom: 0; width: 60%; }
+.skeleton-line.short { width: 40%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== Shake Animation ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.shake { animation: shake 0.4s ease; }
+
+/* ===== Spinner ===== */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ===== History ===== */
+.history {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 2px solid var(--border);
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.history-header h3 {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.history-header .btn-clear {
+  font-size: 13px;
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.history-header .btn-clear:hover {
+  border-color: var(--meaning);
+  color: var(--meaning);
+  background: #fef0ed;
+}
+
+.history-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+.history-item {
+  padding: 5px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 13px;
+  font-family: var(--font-en);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-style: italic;
+}
+
+.history-item:hover {
+  background: #f0e6d2;
+  border-color: var(--meaning);
+  color: var(--meaning);
+}
+
+.history-empty {
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 8px 0;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .container { padding: 20px 14px 40px; }
+
+  .header h1 { font-size: 22px; }
+  .header .subtitle { font-size: 12px; }
+
+  .input-wrapper { flex-direction: column; }
+
+  .input-wrapper .btn-translate {
+    padding: 12px;
+    justify-content: center;
+  }
+
+  .result-card { padding: 14px 16px; }
+  .result-card .card-content { font-size: 14px; }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .container { padding: 24px 24px 48px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <h1>Slang <span>Lens</span></h1>
+      <span class="subtitle">理解英语，不止翻译</span>
+    </div>
+    <button class="btn-settings" id="btnSettings" title="设置 API Key">⚙</button>
+  </header>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3>⚙ 设置 API Key</h3>
+      <p class="hint">
+        使用 DeepSeek API 进行翻译。Key 只存储在你的浏览器本地，不会上传到任何第三方服务器。
+      </p>
+      <input type="password" id="apiKeyInput" placeholder="sk-...">
+      <p class="api-source">
+        没有 Key？<a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 开放平台获取 →</a>
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="btnModalCancel">取消</button>
+        <button class="btn btn-primary" id="btnModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-area">
+    <div class="input-wrapper">
+      <textarea id="inputText" rows="1" placeholder="输入英语俚语、梗或句子... 例如 spill the tea"></textarea>
+      <button class="btn-translate" id="btnTranslate">🔍 翻译</button>
+    </div>
+    <div class="quick-examples">
+      <span class="quick-example" data-text="spill the tea">☕ spill the tea</span>
+      <span class="quick-example" data-text="no cap">🧢 no cap</span>
+      <span class="quick-example" data-text="ghost someone">👻 ghost someone</span>
+      <span class="quick-example" data-text="rizz">✨ rizz</span>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Loading Skeleton -->
+  <div class="skeleton" id="skeleton">
+    <div class="skeleton-card">
+      <div class="skeleton-line short"></div>
+      <div class="skeleton-line"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line short"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line short"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results"></div>
+
+  <!-- History -->
+  <div class="history" id="history">
+    <div class="history-header">
+      <h3>🕐 最近查询</h3>
+      <button class="btn-clear" id="btnClearHistory">清空</button>
+    </div>
+    <div class="history-list" id="historyList">
+      <p class="history-empty">还没有查询记录</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <p class="footer">Powered by DeepSeek · 数据仅保存在你的浏览器</p>
+</div>
+
+<script>
+// ===== Configuration =====
+const DEEPSEEK_API = 'https://api.deepseek.com/chat/completions';
+const DEEPSEEK_MODEL = 'deepseek-chat';
+const CACHE_PREFIX = 'slang_cache_';
+const HISTORY_KEY = 'slang_history';
+const API_KEY_STORAGE = 'slang_api_key';
+const MAX_HISTORY = 20;
+
+// ===== DOM References =====
+const $input = document.getElementById('inputText');
+const $btnTranslate = document.getElementById('btnTranslate');
+const $btnSettings = document.getElementById('btnSettings');
+const $modalOverlay = document.getElementById('modalOverlay');
+const $apiKeyInput = document.getElementById('apiKeyInput');
+const $btnModalSave = document.getElementById('btnModalSave');
+const $btnModalCancel = document.getElementById('btnModalCancel');
+const $results = document.getElementById('results');
+const $skeleton = document.getElementById('skeleton');
+const $errorMsg = document.getElementById('errorMsg');
+const $historyList = document.getElementById('historyList');
+const $btnClearHistory = document.getElementById('btnClearHistory');
+const $quickExamples = document.querySelectorAll('.quick-example');
+
+// ===== API Key Management =====
+function getApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE) || '';
+}
+
+function setApiKey(key) {
+  localStorage.setItem(API_KEY_STORAGE, key);
+}
+
+function showSettings() {
+  $apiKeyInput.value = getApiKey();
+  $modalOverlay.classList.add('active');
+}
+
+function hideSettings() {
+  $modalOverlay.classList.remove('active');
+}
+
+$btnSettings.addEventListener('click', showSettings);
+$btnModalCancel.addEventListener('click', hideSettings);
+$modalOverlay.addEventListener('click', function(e) {
+  if (e.target === $modalOverlay) hideSettings();
+});
+
+$btnModalSave.addEventListener('click', function() {
+  const key = $apiKeyInput.value.trim();
+  if (key) {
+    setApiKey(key);
+    hideSettings();
+  } else {
+    $apiKeyInput.style.borderColor = '#c44536';
+    setTimeout(function() { $apiKeyInput.style.borderColor = ''; }, 1500);
+  }
+});
+
+// ===== Cache =====
+function getCacheKey(text) {
+  return CACHE_PREFIX + text.trim().toLowerCase();
+}
+
+function getFromCache(text) {
+  var raw = localStorage.getItem(getCacheKey(text));
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+
+function saveToCache(text, data) {
+  try {
+    localStorage.setItem(getCacheKey(text), JSON.stringify(data));
+  } catch (e) {
+    clearOldCache();
+    try { localStorage.setItem(getCacheKey(text), JSON.stringify(data)); } catch (e2) {}
+  }
+}
+
+function clearOldCache() {
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.indexOf(CACHE_PREFIX) === 0) keys.push(k);
+  }
+  if (keys.length > 100) {
+    keys.slice(0, keys.length - 100).forEach(function(k) { localStorage.removeItem(k); });
+  }
+}
+
+// ===== History =====
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+  } catch (e) { return []; }
+}
+
+function addToHistory(text) {
+  var history = getHistory();
+  var filtered = history.filter(function(item) { return item !== text; });
+  filtered.unshift(text);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, MAX_HISTORY)));
+  renderHistory();
+}
+
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+}
+
+function renderHistory() {
+  var history = getHistory();
+  if (history.length === 0) {
+    $historyList.innerHTML = '<p class="history-empty">还没有查询记录</p>';
+    return;
+  }
+  $historyList.innerHTML = history.map(function(text) {
+    var escaped = text.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return '<span class="history-item" data-text="' + escaped + '" title="点击重新查询">' + escaped + '</span>';
+  }).join('');
+}
+
+$historyList.addEventListener('click', function(e) {
+  var item = e.target.closest('.history-item');
+  if (!item) return;
+  $input.value = item.dataset.text;
+  doTranslate(item.dataset.text);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+$btnClearHistory.addEventListener('click', function() {
+  if (confirm('确定要清空所有查询记录吗？')) {
+    clearHistory();
+  }
+});
+
+// ===== Helpers =====
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function simpleMarkdown(text) {
+  if (!text) return '';
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code style="background:#f0e6d2;padding:1px 5px;border-radius:3px;font-size:0.9em">$1</code>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n- /g, '\n• ');
+}
+
+// ===== Error Handling =====
+function showError(msg) {
+  $errorMsg.textContent = msg;
+  $errorMsg.classList.add('active');
+}
+
+function hideError() {
+  $errorMsg.classList.remove('active');
+}
+
+// ===== Loading =====
+function showLoading() {
+  hideError();
+  $results.classList.remove('active');
+  $results.innerHTML = '';
+  $skeleton.classList.add('active');
+  $btnTranslate.disabled = true;
+  $btnTranslate.innerHTML = '<span class="spinner"></span> 查询中';
+}
+
+function hideLoading() {
+  $skeleton.classList.remove('active');
+  $btnTranslate.disabled = false;
+  $btnTranslate.innerHTML = '🔍 翻译';
+}
+
+// ===== DeepSeek API =====
+function buildSystemPrompt() {
+  return '你是一个英语俚语/典故/网络梗的专业解释专家。你的用户是中文母语者。\n' +
+    '\n' +
+    '对于用户输入的英文内容：\n' +
+    '1. 判断类型：俚语(slang) / 典故(idiom) / 网梗(meme) / 缩写(abbreviation) / 普通表达(normal)\n' +
+    '2. 如果是俚语/典故/网梗，解释文化来源和真实含义\n' +
+    '3. 如果是普通表达，给出地道的中文翻译，cultural_note 注明"这是一个普通英语表达"\n' +
+    '4. 给出实际用法说明和双语例句\n' +
+    '\n' +
+    '你必须只返回 JSON，不要有任何其他文字。格式：\n' +
+    '{\n' +
+    '  "type": "slang",\n' +
+    '  "original": "原文",\n' +
+    '  "literal": "字面直译（中文）",\n' +
+    '  "real_meaning": "真实含义解释（中文，可用于聊天交流的对应表达）",\n' +
+    '  "cultural_note": "文化背景和来源（中文，详细说明这个表达的出处、演变过程、使用人群）",\n' +
+    '  "usage": "用法说明（中文，什么场景用、什么语气、注意什么）",\n' +
+    '  "example_en": "一句自然的英文例句",\n' +
+    '  "example_cn": "例句的中文翻译",\n' +
+    '  "tags": ["标签1", "标签2"]\n' +
+    '}';
+}
+
+async function callDeepSeek(text) {
+  var apiKey = getApiKey();
+  var response = await fetch(DEEPSEEK_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
+    },
+    body: JSON.stringify({
+      model: DEEPSEEK_MODEL,
+      messages: [
+        { role: 'system', content: buildSystemPrompt() },
+        { role: 'user', content: text }
+      ],
+      temperature: 0.3,
+      max_tokens: 1024
+    })
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) throw new Error('API Key 无效，请点击右上角齿轮检查设置');
+    if (response.status === 402) throw new Error('API 余额不足，请前往 DeepSeek 平台充值');
+    if (response.status === 429) throw new Error('请求太频繁，请稍后再试');
+    throw new Error('API 请求失败 (' + response.status + ')，请检查网络连接');
+  }
+
+  var data = await response.json();
+  var content = data.choices?.[0]?.message?.content;
+
+  if (!content) throw new Error('AI 返回为空，请重试');
+
+  // Try to extract JSON from response (handle cases where AI wraps JSON in markdown)
+  var jsonStr = content.trim();
+  var codeBlockMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
+  if (codeBlockMatch) jsonStr = codeBlockMatch[1].trim();
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    throw new Error('AI 返回格式解析失败，请重试。原始返回：' + content.slice(0, 200));
+  }
+}
+
+// ===== Rendering =====
+function renderResult(data) {
+  hideLoading();
+  $results.innerHTML = buildResultHTML(data);
+  $results.classList.add('active');
+}
+
+function buildResultHTML(data) {
+  var typeLabels = { slang: '俚语', idiom: '典故/习语', meme: '网络梗', abbreviation: '缩写', normal: '普通表达' };
+  var typeLabel = typeLabels[data.type] || data.type;
+
+  var html = '';
+
+  // Literal
+  if (data.literal) {
+    html += '<div class="result-card literal">' +
+      '<div class="card-label">📌 字面直译 · ' + typeLabel + '</div>' +
+      '<div class="card-content">' + simpleMarkdown(data.literal) + '</div>' +
+      '</div>';
+  }
+
+  // Real Meaning
+  if (data.real_meaning) {
+    html += '<div class="result-card meaning">' +
+      '<div class="card-label">🔥 真实含义</div>' +
+      '<div class="card-content">' + simpleMarkdown(data.real_meaning) + '</div>' +
+      '</div>';
+  }
+
+  // Cultural Note
+  if (data.cultural_note) {
+    html += '<div class="result-card culture">' +
+      '<div class="card-label">📖 文化背景</div>' +
+      '<div class="card-content">' + simpleMarkdown(data.cultural_note) + '</div>' +
+      '</div>';
+  }
+
+  // Usage
+  if (data.usage) {
+    html += '<div class="result-card usage">' +
+      '<div class="card-label">💬 用法说明</div>' +
+      '<div class="card-content">' + simpleMarkdown(data.usage) + '</div>' +
+      '</div>';
+  }
+
+  // Example
+  if (data.example_en || data.example_cn) {
+    html += '<div class="result-card example">' +
+      '<div class="card-label">✏️ 例句</div>' +
+      '<div class="card-content">' +
+      (data.example_en ? '<div class="example-en">"' + escapeHtml(data.example_en) + '"</div>' : '') +
+      (data.example_cn ? '<div class="example-cn">' + escapeHtml(data.example_cn) + '</div>' : '') +
+      '</div></div>';
+  }
+
+  // Tags
+  if (data.tags && data.tags.length > 0) {
+    html += '<div class="tags">' +
+      data.tags.map(function(t) { return '<span class="tag">#' + escapeHtml(t) + '</span>'; }).join('') +
+      '</div>';
+  }
+
+  return html;
+}
+
+// ===== Main Action =====
+async function doTranslate(text) {
+  var trimmed = text.trim();
+  if (!trimmed) {
+    showError('请输入要查询的英文内容');
+    $input.classList.add('shake');
+    setTimeout(function() { $input.classList.remove('shake'); }, 400);
+    $input.focus();
+    return;
+  }
+
+  // Check API Key
+  var apiKey = getApiKey();
+  if (!apiKey) {
+    showSettings();
+    showError('请先设置 DeepSeek API Key');
+    return;
+  }
+
+  showLoading();
+  hideError();
+
+  try {
+    // Check cache first
+    var data = getFromCache(trimmed);
+    if (data) {
+      renderResult(data);
+      addToHistory(trimmed);
+      return;
+    }
+
+    // Call API
+    data = await callDeepSeek(trimmed);
+
+    // Ensure required fields
+    data.original = data.original || trimmed;
+    data.type = data.type || 'normal';
+
+    saveToCache(trimmed, data);
+    renderResult(data);
+    addToHistory(trimmed);
+  } catch (err) {
+    hideLoading();
+    showError(err.message || '发生未知错误，请重试');
+  }
+}
+
+// ===== Event Listeners =====
+$btnTranslate.addEventListener('click', function() {
+  doTranslate($input.value);
+});
+
+$input.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    doTranslate($input.value);
+  }
+});
+
+// Auto-resize textarea
+$input.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+$quickExamples.forEach(function(el) {
+  el.addEventListener('click', function() {
+    var text = this.dataset.text;
+    $input.value = text;
+    $input.style.height = 'auto';
+    $input.style.height = Math.min($input.scrollHeight, 120) + 'px';
+    doTranslate(text);
+  });
+});
+
+// ===== Init =====
+function init() {
+  renderHistory();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
